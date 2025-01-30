@@ -38,6 +38,7 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
     orderedPackageAmount = 1,
     currency = "INR",
   } = req.body;
+  
 
   const userId = req.user._id || null;
 
@@ -87,11 +88,19 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
       ORDER_PACKAGES_LIST[Number(orderedPackage)].perTokenPrice *
       requestedToken;
 
-    const razerpayOrder = await razorpay.orders.create({
-      amount: amount * 100,
-      currency: String(currency).toUpperCase(),
-      receipt: "receipt111",
-    });
+      const razerpayOrder = await razorpay.orders.create({
+        amount: amount * 100,
+        currency: String(currency).toUpperCase(),
+        receipt: "receipt111",
+      }).catch((e)=>{
+        console.log(e);
+        return res
+        .status(500)
+        .json(
+          new ApiResponse(500, {}, "Unable to create razorpay order.")
+        );
+      })
+    
 
     const newOrder = await PaymentOrder.create({
       paymentGatwayOrderId: razerpayOrder.id,
