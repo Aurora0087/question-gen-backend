@@ -737,8 +737,8 @@ const currentUserDetails = asyncHandler(async (req, res) => {
 
 const currentUsersCreditHistory = asyncHandler(async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.body.page) || 1;
+    const limit = parseInt(req.body.limit) || 10;
 
     const uId = req.user._id || null;
     

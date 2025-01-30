@@ -8,7 +8,7 @@ dotenv.config({
 import { connectDB } from "./db/index.js";
 import { app } from "./app.js";
 
-const serverPort = process.env.PORT || 8002
+const serverPort = process.env.PORT || 8002;
 
 connectDB()
     .then(() => {

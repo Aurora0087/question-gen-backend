@@ -2,9 +2,10 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const frontendUrl = process.env.FrontendUrl || "http://localhost:3000";
 
-const appName = 'GQus';
+const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
+const appName = 'Qus-Ai';
 
 async function sendVerificationEmail(toEmail, token, uId) {
   const verificationUrl = `${frontendUrl}/auth/email/verify?token=${token}&uId=${uId}`;

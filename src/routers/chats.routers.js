@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { deleteMcq, generateMCQ, getGenaretedMcqByCurrentuser, getMcq, getMcqAnsById, postMcqAns } from "../controllers/chat.controllers.js";
+import { deleteMcq, editMcqTitle, generateMCQ, getGenaretedMcqByCurrentuser, getMcq, getMcqAnsById, postMcqAns, searchGenaretedMcqByCurrentuser } from "../controllers/chat.controllers.js";
 
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyUsersEmailVerifyed } from "../middlewares/auth.middleware.js";
@@ -9,7 +9,7 @@ const chatRouter = Router();
 
 // Open Route
 
-// close route
+// secure route
 
 chatRouter.route("/mcq/post").post(upload.fields([
     {
@@ -20,7 +20,11 @@ chatRouter.route("/mcq/post").post(upload.fields([
 
 chatRouter.route("/mcq/current").post(verifyUsersEmailVerifyed,getGenaretedMcqByCurrentuser);
 
+chatRouter.route("/mcq/current/search").post(verifyUsersEmailVerifyed,searchGenaretedMcqByCurrentuser);
+
 chatRouter.route("/mcq").post(verifyUsersEmailVerifyed,getMcq);
+
+chatRouter.route("/mcq/edit").post(verifyUsersEmailVerifyed,editMcqTitle);
 
 chatRouter.route("/mcq/delete").post(verifyUsersEmailVerifyed,deleteMcq);
 

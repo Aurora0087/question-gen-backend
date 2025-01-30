@@ -78,7 +78,7 @@ const generateMCQ = asyncHandler(async (req, res) => {
       // try genareting mcqs in json format max count = 5
       do {
         loopCount += 1;
-        
+
         try {
           const anthropicResponse = await anthropic.messages.create({
             model: "claude-3-5-haiku-20241022",
@@ -136,9 +136,9 @@ const generateMCQ = asyncHandler(async (req, res) => {
 
       await CreditHistory.create({
         owner: new mongoose.Types.ObjectId(req.user._id || ""),
-        historyType:"DECREASE",
-        pointValue:-1,
-        note:`Created new Mcq paper ${aiRes.topic}`
+        historyType: "DECREASE",
+        pointValue: -1,
+        note: `Created new Mcq paper ${aiRes.topic}`,
       });
 
       return res
@@ -263,12 +263,11 @@ const generateMCQ = asyncHandler(async (req, res) => {
     credit.point -= 5;
     await credit.save();
 
-
     await CreditHistory.create({
       owner: new mongoose.Types.ObjectId(req.user._id || ""),
-      historyType:"DECREASE",
-      pointValue:-5,
-      note:`Created new Mcq paper ${aiRes.topic}`
+      historyType: "DECREASE",
+      pointValue: -5,
+      note: `Created new Mcq paper ${aiRes.topic}`,
     });
 
     return res
@@ -298,8 +297,8 @@ const generateMCQ = asyncHandler(async (req, res) => {
 // get mcq created by current user
 
 const getGenaretedMcqByCurrentuser = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(req.body.page) || 1;
+  const limit = parseInt(req.body.limit) || 10;
 
   const uId = req.user._id || null;
 
@@ -332,6 +331,23 @@ const getGenaretedMcqByCurrentuser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(200, mcqs, "Current users Mcqs fetched successfully.")
     );
+});
+
+const searchGenaretedMcqByCurrentuser = asyncHandler(async (req, res) => {
+  const { q } = req.body;
+
+  const uId = req.user._id || null;
+
+  if(!q){
+    return res.status(400).json(new ApiResponse(400, [], ""));
+  }
+
+  const mcqs = await Mcq.find({
+    owner: new mongoose.Types.ObjectId(uId),
+    topic: { $regex: q, $options: "i" }, // 'i' for case-insensitive matching
+  }).select("-questions");
+
+  return res.status(200).json(new ApiResponse(200, mcqs, ""));
 });
 
 // get mcq from mcqId
@@ -375,6 +391,50 @@ const getMcq = asyncHandler(async (req, res) => {
     return res
       .status(500)
       .json(new ApiResponse(500, {}, "Something went wrong while geting Mcq."));
+  }
+});
+
+// edit mcq title name
+
+const editMcqTitle = asyncHandler(async (req, res) => {
+  const { mcqId, newTitle } = req.body;
+
+  if (!mcqId) {
+    return res.status(400).json(new ApiResponse(400, {}, "Mcq Id not given."));
+  }
+
+  if (!mongoose.isValidObjectId(mcqId)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, {}, "Mcq Id not given Properly."));
+  }
+
+  try {
+    const mcq = await Mcq.findById(mcqId);
+
+    if (!mcq) {
+      return res.status(404).json(new ApiResponse(404, {}, "Mcq can,t find."));
+    }
+
+    if (String(mcq.owner) !== String(req.user._id)) {
+      return res
+        .status(403)
+        .json(new ApiResponse(403, {}, "You can't edit this mcq."));
+    }
+
+    mcq.topic = newTitle;
+
+    await mcq.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Mcq paper's title edited succesfully."));
+  } catch (err) {
+    return res
+      .status(500)
+      .json(
+        new ApiResponse(500, {}, "Something went wrong while editing title.")
+      );
   }
 });
 
@@ -486,8 +546,8 @@ const postMcqAns = asyncHandler(async (req, res) => {
 const getMcqAnsById = asyncHandler(async (req, res) => {
   const { mcqId } = req.body;
 
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(req.body.page) || 1;
+  const limit = parseInt(req.body.limit) || 10;
 
   try {
     if (!mcqId) {
@@ -586,7 +646,9 @@ export {
   generateMCQ,
   generateSAQ,
   getGenaretedMcqByCurrentuser,
+  searchGenaretedMcqByCurrentuser,
   getMcq,
+  editMcqTitle,
   deleteMcq,
   postMcqAns,
   getMcqAnsById,

@@ -1,12 +1,12 @@
 {
   "name": "question-gen-backend",
   "version": "0.1.0",
-  "description": "Q&A Gen backend",
+  "description": "Qus-Ai backend",
   "type": "module",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "start": "node src/index.js"
+    "start": "node -r dotenv/config src/index.js"
   },
   "author": "aurora",
   "license": "ISC",
