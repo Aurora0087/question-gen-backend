@@ -295,6 +295,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const googleAuthLOginRegister = asyncHandler(async (req, res) => {
   const { appwriteUserId, provider, email, name } = req.body;
+  
 
   if (
     [appwriteUserId, provider, email, name].some(
@@ -307,6 +308,7 @@ const googleAuthLOginRegister = asyncHandler(async (req, res) => {
   }
 
   const appWriteUser = await getUser(appwriteUserId);
+  
 
   if (!appWriteUser) {
     return res.status(400).json(new ApiResponse(400, {}, "User not Found."));
