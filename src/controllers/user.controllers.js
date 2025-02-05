@@ -273,6 +273,12 @@ const loginUser = asyncHandler(async (req, res) => {
     user._id
   );
 
+  // get credit points
+
+  const userCredit = await Credit.findOne({
+    owner: new mongoose.Types.ObjectId(user._id),
+  });
+
   //send token cookices
 
   return res
@@ -284,7 +290,11 @@ const loginUser = asyncHandler(async (req, res) => {
         200,
         {
           userName: user.username,
-          uid: user._id,
+            uid: user._id,
+            avatar: user.avatar,
+            userCredit: userCredit.point || 0,
+            accesToken,
+            refreshToken,
         },
         "User Login Successfully."
       )
